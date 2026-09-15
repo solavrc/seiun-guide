@@ -79,9 +79,12 @@ h1 { margin: 0; color: #fffaf0; font-family: Georgia, "Hiragino Mincho ProN", "Y
 .status-active { color: var(--green); background: var(--green-soft); border-color: #c1e1d2; }
 .status-conditional { color: var(--amber); background: var(--amber-soft); border-color: #ecd39f; }
 .status-effectless, .status-unavailable { color: #5d636c; background: var(--gray-soft); border-color: #d0d2d0; }
-.status-unknown { color: #5e6f81; background: #f5f7f7; border-color: #d6dfe1; }
 .result-count { flex: 0 0 auto; margin: 0; color: var(--ink-soft); font-size: 13px; font-variant-numeric: tabular-nums; }
 .result-count strong { color: var(--ink); font-size: 15px; }
+.stamp-rule-nav { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin: -17px 0 30px; padding: 10px 13px; color: var(--ink-soft); background: rgba(255, 253, 249, .72); border: 1px solid var(--line); border-radius: 11px; font-size: 12px; }
+.stamp-rule-nav > span { margin-right: 3px; color: var(--navy); font-weight: 800; }
+.stamp-rule-nav a { padding: 3px 9px; color: var(--navy); background: var(--blue-wash); border: 1px solid #d2e1e6; border-radius: 999px; text-decoration: none; white-space: nowrap; }
+.stamp-rule-nav a:hover { border-color: var(--navy); background: #dfecef; }
 
 .catalogue-section { scroll-margin-top: 20px; }
 .section-heading { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 16px; padding: 0 4px; }
@@ -104,7 +107,7 @@ h1 { margin: 0; color: #fffaf0; font-family: Georgia, "Hiragino Mincho ProN", "Y
 .card-link { position: absolute; top: 8px; right: 10px; display: inline-grid; place-items: center; width: 24px; height: 24px; color: #7e8a8f; border-radius: 50%; text-decoration: none; font-size: 15px; }
 .card-link:hover { color: var(--navy); background: var(--blue-wash); }
 .stamp-rail { grid-column: 3; display: flex; flex-wrap: wrap; justify-content: end; gap: 5px; width: 96px; padding-top: 22px; }
-.stamp-badge { position: relative; display: inline-grid; place-items: center; width: 31px; height: 31px; padding: 2px; background: #fff; border: 1px solid #ced6d4; border-radius: 8px; transition: border-color .15s ease, transform .15s ease; }
+.stamp-badge { position: relative; display: inline-grid; place-items: center; width: 31px; height: 31px; padding: 2px; color: inherit; background: #fff; border: 1px solid #ced6d4; border-radius: 8px; text-decoration: none; transition: border-color .15s ease, transform .15s ease; }
 .stamp-badge:hover { border-color: var(--navy); transform: translateY(-1px); }
 .stamp-badge img { width: 100%; height: 100%; object-fit: contain; }
 .stamp-badge .stamp-mark { position: absolute; right: -4px; bottom: -5px; display: grid; place-items: center; width: 14px; height: 14px; color: #fff; border: 2px solid #fff; border-radius: 50%; font-size: 9px; line-height: 1; font-weight: 900; }
@@ -114,16 +117,12 @@ h1 { margin: 0; color: #fffaf0; font-family: Georgia, "Hiragino Mincho ProN", "Y
 .stamp-badge.status-conditional .stamp-mark { background: var(--amber); }
 .stamp-badge.status-effectless, .stamp-badge.status-unavailable { border-color: #bdc1c0; background: #eeefed; filter: grayscale(.6); }
 .stamp-badge.status-effectless .stamp-mark, .stamp-badge.status-unavailable .stamp-mark { background: var(--gray); }
-.stamp-badge.status-mixed { border-color: #d9bd7b; background: #fff8e9; }
-.stamp-badge.status-mixed .stamp-mark { color: #fff; background: var(--amber); font-size: 8px; }
-.stamp-badge.status-unknown { border-color: #cfd9dc; background: #fbfcfc; }
-.stamp-badge.status-unknown .stamp-mark { color: #4e6678; background: #e6edef; }
+.stamp-badge-rule { border-color: #c9d2d1; background: #fbfcfb; }
 .stamp-badge .sr-only { width: 1px; }
 .status-mark-active::after { content: "✓"; }
 .status-mark-conditional::after { content: "~"; }
 .status-mark-effectless::after { content: "−"; }
 .status-mark-unavailable::after { content: "×"; }
-.status-mark-unknown::after { content: "?"; }
 
 .card-body { padding: 0 17px; }
 .variant-block { padding: 15px 0 16px; border-bottom: 1px solid #e5e3dd; }
@@ -137,10 +136,9 @@ h1 { margin: 0; color: #fffaf0; font-family: Georgia, "Hiragino Mincho ProN", "Y
 .dynamic-markers { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin: 10px 0 0; color: var(--ink-soft); font-size: 11px; }
 .dynamic-label { margin-right: 2px; font-weight: 700; }
 .marker { padding: 1px 6px; color: var(--navy); background: #eef4f3; border: 1px solid #d2dfdc; border-radius: 5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-.variant-stamps { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 11px; padding-top: 9px; border-top: 1px dashed #dfe1dd; }
-.variant-stamps-label { margin-right: 2px; color: var(--ink-soft); font-size: 11px; font-weight: 700; }
-.variant-stamps .stamp-badge { width: 25px; height: 25px; border-radius: 6px; }
-.variant-stamps .stamp-mark { width: 11px; height: 11px; right: -4px; bottom: -4px; border-width: 1px; font-size: 8px; }
+.stamp-rules { margin: 0 17px 16px; padding: 11px 13px 12px; color: #4c5964; background: #f0f4f2; border: 1px solid #d9e3de; border-radius: 11px; }
+.stamp-rules-heading { margin: 0 0 5px; color: var(--navy); font-size: 12px; font-weight: 800; letter-spacing: .04em; }
+.stamp-rules-list { display: grid; gap: 5px; margin: 0; padding-left: 1.25em; font-size: 13px; line-height: 1.65; }
 .card-notes { margin: 0 17px 16px; padding: 0 13px 11px; background: #f7f5ef; border: 1px solid #e5e0d4; border-radius: 11px; }
 .card-notes summary { display: flex; align-items: center; gap: 6px; padding: 11px 0 6px; color: var(--navy); cursor: pointer; font-size: 12px; font-weight: 800; letter-spacing: .04em; list-style-position: inside; }
 .card-notes summary::marker { color: var(--gold); }
@@ -148,11 +146,11 @@ h1 { margin: 0; color: #fffaf0; font-family: Georgia, "Hiragino Mincho ProN", "Y
 .note-content { padding-bottom: 1px; }
 .note-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .note-item { display: block; color: #4c5964; font-size: 13px; line-height: 1.7; }
-.note-variant { display: inline-block; margin-right: 5px; padding: 1px 5px; color: #87602e; background: #f8ecd7; border: 1px solid #ead5ae; border-radius: 4px; font-size: 10px; line-height: 1.4; font-weight: 800; vertical-align: baseline; }
-.note-item .status-chip { margin-right: 6px; vertical-align: baseline; }
-.empty-note { display: flex; align-items: center; gap: 7px; margin: 0; color: #65717b; font-size: 13px; }
-.empty-note .status-chip { flex: 0 0 auto; }
-.all-stamps { margin-top: 11px; border-top: 1px solid #e7e4da; }
+.note-kind { display: inline-block; margin-right: 6px; padding: 1px 5px; border: 1px solid transparent; border-radius: 4px; font-size: 10px; line-height: 1.4; font-weight: 800; vertical-align: baseline; }
+.note-kind-correction { color: #7d4b23; background: #f8ecd7; border-color: #ead5ae; }
+.note-kind-interaction { color: #245d6e; background: #e6f1f3; border-color: #c7dfe4; }
+.note-kind-exception { color: #674b79; background: #eee7f2; border-color: #d9cbe1; }
+.all-stamps { margin: 0 17px 16px; padding: 0 13px 11px; background: #f7f5ef; border: 1px solid #e5e0d4; border-radius: 11px; }
 .all-stamps summary { padding-top: 10px; color: var(--navy); cursor: pointer; font-size: 12px; font-weight: 800; }
 .all-stamp-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px 5px; padding-top: 10px; }
 .all-stamp-item { display: grid; justify-items: center; gap: 3px; min-width: 0; color: var(--ink-soft); font-size: 9px; line-height: 1.25; text-align: center; }
@@ -198,7 +196,7 @@ h1 { margin: 0; color: #fffaf0; font-family: Georgia, "Hiragino Mincho ProN", "Y
   .stamp-rail { width: 73px; gap: 4px; }
   .stamp-badge { width: 28px; height: 28px; }
   .card-body { padding: 0 14px; }
-  .card-notes { margin-left: 14px; margin-right: 14px; }
+  .stamp-rules, .card-notes, .all-stamps { margin-left: 14px; margin-right: 14px; }
   .public-source { padding-right: 14px; }
   .all-stamp-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
 }

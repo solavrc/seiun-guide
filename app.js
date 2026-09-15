@@ -1,9 +1,8 @@
 const STATUS_LABELS = Object.freeze({
-  active: "有効",
-  conditional: "条件付き",
-  effectless: "効果なし",
+  active: "適用",
+  conditional: "一部適用",
+  effectless: "対象外",
   unavailable: "付与不可",
-  unknown: "未確認",
 });
 
 const PRIORITY_STAMP_IDS = ["600160", "600180", "600190", "600310"];
@@ -12,7 +11,11 @@ const STATUS_MARKS = Object.freeze({
   conditional: "~",
   effectless: "−",
   unavailable: "×",
-  unknown: "?",
+});
+const NOTE_KIND_LABELS = Object.freeze({
+  correction: "訂正",
+  interaction: "相互作用",
+  exception: "例外",
 });
 
 const state = {
@@ -45,7 +48,7 @@ function normalize(value) {
 }
 
 function safeStatus(value) {
-  return Object.hasOwn(STATUS_LABELS, value) ? value : "unknown";
+  return Object.hasOwn(STATUS_LABELS, value) ? value : null;
 }
 
 function element(tag, className, text) {
@@ -59,38 +62,31 @@ function stampFor(id) {
   return state.stamps.find((stamp) => String(stamp.id) === String(id));
 }
 
-function variantStampState(variant, stampId) {
-  return safeStatus(variant?.stampStates?.[String(stampId)]);
-}
-
 function groupStampState(card, stampId) {
-  const states = card.variants.map((variant) => variantStampState(variant, stampId));
-  if (!states.length || states.every((value) => value === "unknown")) return "unknown";
-  return states.every((value) => value === states[0]) ? states[0] : "mixed";
+  return safeStatus(card.stampStates?.[String(stampId)]);
 }
 
 function groupStampDetails(card, stampId) {
-  const states = card.variants.map((variant) => variantStampState(variant, stampId));
-  return { status: groupStampState(card, stampId), states };
+  const key = String(stampId);
+  return {
+    status: groupStampState(card, stampId),
+    reason: typeof card.stampReasons?.[key] === "string" ? card.stampReasons[key].trim() : "",
+  };
 }
 
-function statusChip(status, compact = false) {
+function noteKindChip(kind) {
+  if (!Object.hasOwn(NOTE_KIND_LABELS, kind)) return null;
+  return element("span", `note-kind note-kind-${kind}`, NOTE_KIND_LABELS[kind]);
+}
+
+function stampBadge(stamp, status, { compact = false, reason = "" } = {}) {
   const normalized = safeStatus(status);
-  const chip = element("span", `status-chip status-${normalized}`);
-  const mark = element("b", "", STATUS_MARKS[normalized]);
-  mark.setAttribute("aria-hidden", "true");
-  chip.append(mark, document.createTextNode(compact ? STATUS_MARKS[normalized] : ` ${STATUS_LABELS[normalized]}`));
-  if (compact) chip.setAttribute("aria-label", STATUS_LABELS[normalized]);
-  return chip;
-}
-
-function stampBadge(stamp, status, { compact = false } = {}) {
-  const mixed = status === "mixed";
-  const normalized = mixed ? "mixed" : safeStatus(status);
-  const label = `${stamp?.name ?? `印 ${stamp?.id ?? ""}`}: ${mixed ? "版で異なる" : STATUS_LABELS[normalized]}`;
-  const badge = element("span", `stamp-badge status-${normalized}`);
-  badge.setAttribute("role", "img");
-  badge.tabIndex = 0;
+  if (!stamp || !normalized) return null;
+  const baseLabel = `${stamp.name ?? `印 ${stamp.id ?? ""}`}: ${STATUS_LABELS[normalized]}`;
+  const label = reason ? `${baseLabel}。${reason}` : baseLabel;
+  const badge = document.createElement("a");
+  badge.className = `stamp-badge status-${normalized}`;
+  badge.href = `#card-${stamp.id}`;
   badge.setAttribute("aria-label", label);
   badge.setAttribute("title", label);
   if (stamp?.image) {
@@ -100,7 +96,7 @@ function stampBadge(stamp, status, { compact = false } = {}) {
     image.loading = "lazy";
     badge.append(image);
   }
-  const mark = element("span", `stamp-mark status-mark-${normalized}`, mixed ? "↕" : STATUS_MARKS[normalized]);
+  const mark = element("span", `stamp-mark status-mark-${normalized}`, STATUS_MARKS[normalized]);
   mark.setAttribute("aria-hidden", "true");
   badge.append(mark);
   if (!compact) {
@@ -110,6 +106,24 @@ function stampBadge(stamp, status, { compact = false } = {}) {
   return badge;
 }
 
+function stampRuleLink(stamp) {
+  if (!stamp) return null;
+  const label = `${stamp.name ?? `印 ${stamp.id ?? ""}`}の共通ルール`;
+  const link = document.createElement("a");
+  link.className = "stamp-badge stamp-badge-rule";
+  link.href = `#card-${stamp.id}`;
+  link.setAttribute("aria-label", label);
+  link.setAttribute("title", label);
+  if (stamp.image) {
+    const image = document.createElement("img");
+    image.src = stamp.image;
+    image.alt = "";
+    image.loading = "lazy";
+    link.append(image);
+  }
+  return link;
+}
+
 function stampRow(card, { compact = false } = {}) {
   const rail = element("div", compact ? "stamp-rail" : "variant-stamps");
   if (!compact) rail.append(element("span", "variant-stamps-label", "印状態"));
@@ -117,46 +131,28 @@ function stampRow(card, { compact = false } = {}) {
     const stamp = stampFor(stampId);
     if (!stamp) continue;
     const details = groupStampDetails(card, stampId);
-    const badge = stampBadge(stamp, details.status, { compact });
-    if (details.status === "mixed") {
-      const variants = card.variants.map((variant) => `${variant.variant === "＋" ? "＋" : "通常"}:${STATUS_LABELS[variantStampState(variant, stampId)]}`).join(" / ");
-      const label = `${stamp.name}: 版で異なる（${variants}）`;
-      badge.setAttribute("aria-label", label);
-      badge.title = label;
-    }
-    rail.append(badge);
+    const badge = details.status
+      ? stampBadge(stamp, details.status, { compact, reason: details.reason })
+      : stampRuleLink(stamp);
+    if (badge) rail.append(badge);
   }
-  return rail;
-}
-
-function variantStampRow(card, variant) {
-  const row = element("div", "variant-stamps");
-  row.append(element("span", "variant-stamps-label", "印状態"));
-  for (const stampId of PRIORITY_STAMP_IDS) {
-    const stamp = stampFor(stampId);
-    if (!stamp) continue;
-    row.append(stampBadge(stamp, variantStampState(variant, stampId), { compact: true }));
-  }
-  return row;
+  return rail.children.length ? rail : null;
 }
 
 function allStampPanel(card) {
+  const stored = state.stamps.filter((stamp) => safeStatus(card.stampStates?.[String(stamp.id)]));
+  if (!stored.length || stored.every((stamp) => PRIORITY_STAMP_IDS.includes(String(stamp.id)))) return null;
   const details = document.createElement("details");
   details.className = "all-stamps";
   const summary = document.createElement("summary");
   summary.textContent = "すべての印の状態を表示";
   details.append(summary);
   const grid = element("div", "all-stamp-grid");
-  for (const stamp of state.stamps) {
+  for (const stamp of stored) {
     const item = element("div", "all-stamp-item");
     const details = groupStampDetails(card, stamp.id);
-    const badge = stampBadge(stamp, details.status, { compact: true });
-    if (details.status === "mixed") {
-      const variants = card.variants.map((variant) => `${variant.variant === "＋" ? "＋" : "通常"}:${STATUS_LABELS[variantStampState(variant, stamp.id)]}`).join(" / ");
-      const label = `${stamp.name}: 版で異なる（${variants}）`;
-      badge.setAttribute("aria-label", label);
-      badge.title = label;
-    }
+    const badge = stampBadge(stamp, details.status, { compact: true, reason: details.reason });
+    if (!badge) continue;
     item.append(badge);
     item.append(element("span", "", stamp.name.replace(/の印$/, "")));
     grid.append(item);
@@ -181,23 +177,19 @@ function cardIndex(card) {
       variant.variant,
       variant.text,
       ...(variant.dynamicMarkers ?? []),
-      ...(variant.notes ?? []).map((note) => note.text),
     ]),
     ...(card.notes ?? []).map((note) => note.text),
+    ...(card.rules ?? []),
+    ...Object.values(card.stampReasons ?? {}),
   ].join(" "));
 }
 
 function cardStatuses(card) {
   const statuses = new Set();
-  const variants = card.category === "お守り" ? visibleVariants(card) : card.variants;
-  for (const variant of variants) {
-    for (const value of Object.values(variant.stampStates ?? {})) statuses.add(safeStatus(value));
+  for (const value of Object.values(card.stampStates ?? {})) {
+    const status = safeStatus(value);
+    if (status) statuses.add(status);
   }
-  // Compatibility states are the source for amulet filtering.  A stamp/rune
-  // entry has no compatibility map, so its public note statuses remain
-  // useful as the fallback for the status filter.
-  if (!statuses.size) for (const note of card.notes ?? []) statuses.add(safeStatus(note.status));
-  if (!statuses.size) statuses.add("unknown");
   return statuses;
 }
 
@@ -225,15 +217,23 @@ function renderVariant(card, variant) {
     for (const marker of variant.dynamicMarkers) markers.append(element("code", "marker", marker));
     section.append(markers);
   }
-  if (card.category === "お守り") section.append(variantStampRow(card, variant));
   return section;
 }
 
-function noteVariantLabels(card, note) {
-  if (card.variants.length < 2) return [];
-  const matching = card.variants.filter((variant) => (variant.notes ?? []).some((candidate) => candidate.status === note.status && candidate.text === note.text));
-  if (!matching.length || matching.length === card.variants.length) return [];
-  return matching.map((variant) => variant.variant === "＋" ? "＋" : variant.variant === "通常" ? "通常" : variant.variant);
+function renderRules(card) {
+  if (card.category !== "印" || !Array.isArray(card.rules) || !card.rules.length) return null;
+  const section = element("section", "stamp-rules");
+  const heading = element("h4", "stamp-rules-heading", "共通ルール");
+  heading.id = `rules-${card.id}`;
+  section.setAttribute("aria-labelledby", heading.id);
+  section.append(heading);
+  const list = element("ul", "stamp-rules-list");
+  for (const rule of card.rules) {
+    if (typeof rule === "string" && rule.trim()) list.append(element("li", "", rule.trim()));
+  }
+  if (!list.children.length) return null;
+  section.append(list);
+  return section;
 }
 
 function renderCard(card) {
@@ -260,7 +260,10 @@ function renderCard(card) {
   head.append(element("h3", "", card.name));
   head.append(element("span", "card-id", `ID ${firstId}${card.variants.length > 1 ? ` · ${card.variants.length}版` : ""}`));
   top.append(head);
-  if (card.category === "お守り") top.append(stampRow(card, { compact: true }));
+  if (card.category === "お守り") {
+    const rail = stampRow(card, { compact: true });
+    if (rail) top.append(rail);
+  }
   const link = document.createElement("a");
   link.className = "card-link";
   link.href = `#card-${firstId}`;
@@ -274,29 +277,33 @@ function renderCard(card) {
   for (const variant of visibleVariants(card)) body.append(renderVariant(card, variant));
   article.append(body);
 
-  const notes = document.createElement("details");
-  notes.className = "card-notes";
-  const summary = document.createElement("summary");
-  summary.textContent = `▱  備考${card.notes?.length ? `（${card.notes.length}件）` : ""}`;
-  notes.append(summary);
-  const noteContent = element("div", "note-content");
-  if (card.notes?.length) {
+  const rules = renderRules(card);
+  if (rules) article.append(rules);
+
+  const notes = Array.isArray(card.notes) ? card.notes.filter((note) => note && typeof note.text === "string" && note.text.trim() && Object.hasOwn(NOTE_KIND_LABELS, note.kind)) : [];
+  if (notes.length) {
+    const noteDetails = document.createElement("details");
+    noteDetails.className = "card-notes";
+    const summary = document.createElement("summary");
+    summary.textContent = `▱  備考（${notes.length}件）`;
+    noteDetails.append(summary);
+    const noteContent = element("div", "note-content");
     const list = element("ul", "note-list");
-    for (const note of card.notes) {
+    for (const note of notes) {
       const item = element("li", "note-item");
-      for (const label of noteVariantLabels(card, note)) item.append(element("span", "note-variant", `${label}版`));
-      item.append(statusChip(note.status), document.createTextNode(note.text));
+      const kind = noteKindChip(note.kind);
+      if (kind) item.append(kind);
+      item.append(document.createTextNode(note.text.trim()));
       list.append(item);
     }
     noteContent.append(list);
-  } else {
-    const empty = element("p", "empty-note");
-    empty.append(statusChip("unknown"), document.createTextNode("公開注記は未確認です。"));
-    noteContent.append(empty);
+    noteDetails.append(noteContent);
+    article.append(noteDetails);
   }
-  if (state.stamps.length && card.category === "お守り") noteContent.append(allStampPanel(card));
-  notes.append(noteContent);
-  article.append(notes);
+  if (card.category === "お守り") {
+    const panel = allStampPanel(card);
+    if (panel) article.append(panel);
+  }
 
   const source = card.variants[0]?.publicSourceURL;
   if (source) {
@@ -321,7 +328,6 @@ function render() {
   const strong = element("strong", "", `${filtered.length}`);
   elements.count.append(strong, document.createTextNode(` 図柄 · ${visibleCount} 本文`));
   elements.clearSearch.hidden = !state.query;
-  focusHash();
 }
 
 function resetFilters() {
@@ -351,14 +357,44 @@ function populateSelect(select, values) {
   select.replaceChildren(fragment);
 }
 
+function hasActiveFilters() {
+  return Boolean(state.query || state.category !== "all" || state.rarity !== "all" || state.variant !== "all" || state.status !== "all");
+}
+
+function targetForHash(raw) {
+  return document.getElementById(raw) ?? [...document.querySelectorAll(".catalogue-card")].find((card) => card.dataset.cardIds?.split(",").includes(raw.replace(/^card-/, "")));
+}
+
 function focusHash() {
-  const raw = decodeURIComponent(window.location.hash.slice(1));
+  let raw = "";
+  try {
+    raw = decodeURIComponent(window.location.hash.slice(1));
+  } catch {
+    return;
+  }
   if (!raw) return;
-  const target = document.getElementById(raw) ?? [...document.querySelectorAll(".catalogue-card")].find((card) => card.dataset.cardIds?.split(",").includes(raw.replace(/^card-/, "")));
+  const target = targetForHash(raw);
+  if (!target && hasActiveFilters() && raw.startsWith("card-")) {
+    resetFilters();
+    return;
+  }
   if (!target) return;
   document.querySelectorAll(".is-target").forEach((node) => node.classList.remove("is-target"));
   target.classList.add("is-target");
   window.setTimeout(() => target.scrollIntoView({ block: "start", behavior: "smooth" }), 0);
+}
+
+function handleCardLink(event) {
+  const link = event.target.closest?.("a[href^='#card-']");
+  if (!link || !hasActiveFilters()) return;
+  const href = link.getAttribute("href");
+  if (!href) return;
+  const raw = href.slice(1);
+  if (targetForHash(raw)) return;
+  event.preventDefault();
+  resetFilters();
+  if (window.location.hash === href) focusHash();
+  else window.location.hash = raw;
 }
 
 function bindControls() {
@@ -371,6 +407,7 @@ function bindControls() {
   elements.variant.addEventListener("change", (event) => { state.variant = event.target.value; render(); });
   elements.status.addEventListener("change", (event) => { state.status = event.target.value; render(); });
   window.addEventListener("hashchange", focusHash);
+  document.addEventListener("click", handleCardLink);
   document.addEventListener("keydown", (event) => {
     if (event.key === "/" && document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "SELECT") {
       event.preventDefault();
@@ -402,6 +439,7 @@ async function start() {
     populateSelect(elements.rarity, [...new Set(state.cards.map((card) => card.rarity))]);
     bindControls();
     render();
+    focusHash();
   } catch (error) {
     console.error(error);
     elements.loadError.hidden = false;

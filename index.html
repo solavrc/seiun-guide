@@ -16,7 +16,7 @@
           <div class="hero-copy">
             <p class="eyebrow">失われた聖餌</p>
             <h1 id="page-title">お守りと印の図鑑</h1>
-            <p class="hero-lede">通常版と強化版の原文を並べ、印の働きと組み合わせを備考で確かめる図鑑。</p>
+            <p class="hero-lede">通常版と強化版の原文を並べ、印の共通ルールと個別の相互作用を参照する図鑑。</p>
           </div>
           <dl class="hero-stats" aria-label="収録数">
             <div><dt>図柄</dt><dd>233</dd></div>
@@ -42,25 +42,26 @@
             <label class="select-field"><span>種類</span><select id="category-filter" aria-label="種類で絞り込む"><option value="all">すべて</option></select></label>
             <label class="select-field"><span>レア度・区分</span><select id="rarity-filter" aria-label="レア度・区分で絞り込む"><option value="all">すべて</option></select></label>
             <label class="select-field"><span>版</span><select id="variant-filter" aria-label="版で絞り込む"><option value="all">通常・＋</option><option value="通常">通常のみ</option><option value="＋">＋のみ</option></select></label>
-            <label class="select-field"><span>印状態</span><select id="status-filter" aria-label="印状態で絞り込む"><option value="all">すべて</option><option value="active">有効</option><option value="conditional">条件付き</option><option value="effectless">効果なし</option><option value="unavailable">付与不可</option><option value="unknown">未確認</option></select></label>
+            <label class="select-field"><span>印状態</span><select id="status-filter" aria-label="印状態で絞り込む"><option value="all">すべて</option><option value="active">適用</option><option value="conditional">一部適用</option><option value="effectless">対象外</option><option value="unavailable">付与不可</option></select></label>
           </div>
           <div class="toolbar-row">
             <div class="legend" aria-label="印状態の凡例">
               <span class="legend-label">印状態</span>
-              <span class="status-chip status-active"><b aria-hidden="true">✓</b> 有効</span>
-              <span class="status-chip status-conditional"><b aria-hidden="true">~</b> 条件付き</span>
-              <span class="status-chip status-effectless"><b aria-hidden="true">−</b> 効果なし</span>
+              <span class="status-chip status-active"><b aria-hidden="true">✓</b> 適用</span>
+              <span class="status-chip status-conditional"><b aria-hidden="true">~</b> 一部適用</span>
+              <span class="status-chip status-effectless"><b aria-hidden="true">−</b> 対象外</span>
               <span class="status-chip status-unavailable"><b aria-hidden="true">×</b> 付与不可</span>
-              <span class="status-chip status-unknown"><b aria-hidden="true">?</b> 未確認</span>
             </div>
             <p class="result-count" id="result-count" role="status" aria-live="polite"></p>
           </div>
         </section>
 
+        <nav class="stamp-rule-nav" aria-label="印の共通ルール"><span>印の共通ルール</span><a href="#card-600160">拡張</a><a href="#card-600180">こだま</a><a href="#card-600190">天使</a><a href="#card-600310">悪魔</a></nav>
+
         <section class="catalogue-section" aria-labelledby="catalogue-heading">
           <div class="section-heading">
             <div><p class="eyebrow">THE COLLECTION</p><h2 id="catalogue-heading">収録カード</h2></div>
-            <p class="section-hint">右上の印は拡張・こだま・天使・悪魔。条件付きには本文からの候補を含み、未確認は効果なしと区別しています。</p>
+            <p class="section-hint">印は各お守りに共通ルールを適用した表示です。右上のアイコンから印の説明へ。一部適用は、本体の一部の効果が対象です。</p>
           </div>
           <div id="card-grid" class="card-grid" aria-live="polite"></div>
           <div id="empty-state" class="empty-state" hidden>
@@ -79,7 +80,7 @@
       <footer class="site-footer">
         <p>本文は原文の表記を保ったまま掲載しています。表示変数（例：<code>{0}</code>）も原文どおりです。</p>
         <p>非公式の参照資料です。ゲーム本文・名称・画像の権利は各権利者に帰属します。<a href="https://github.com/solavrc/seiun-guide#出典権利">出典・読み方</a></p>
-        <p>本文基準日：2026-09-01<span class="notes-date"> ／ 公開注記：2026-09-15</span></p>
+        <p>本文基準日：2026-09-01<span class="notes-date"> ／ 公開注記：2026-09-16</span></p>
       </footer>
     </div>
     <script type="module" src="./app.js"></script>
