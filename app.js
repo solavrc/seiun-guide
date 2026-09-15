@@ -5,6 +5,7 @@ const STATUS_LABELS = Object.freeze({
 
 const RAIL_STAMP_IDS = ["600190", "600310"];
 const EFFECTIVE_STAMP_STATES = new Set(["active", "conditional"]);
+const AMULET_RARITIES = Object.freeze(["ノーマル", "レア", "スーパーレア", "ウルトラレア", "お化け"]);
 const STATUS_MARKS = Object.freeze({
   active: "✓",
   conditional: "~",
@@ -21,8 +22,6 @@ const state = {
   query: "",
   category: "all",
   rarity: "all",
-  variant: "all",
-  stampFilter: "all",
 };
 
 const elements = {
@@ -35,8 +34,7 @@ const elements = {
   emptyReset: document.querySelector("#empty-reset"),
   category: document.querySelector("#category-filter"),
   rarity: document.querySelector("#rarity-filter"),
-  variant: document.querySelector("#variant-filter"),
-  stampFilter: document.querySelector("#stamp-filter"),
+  rarityField: document.querySelector("#rarity-field"),
   count: document.querySelector("#result-count"),
 };
 
@@ -158,11 +156,6 @@ function renderQuote(quote) {
   return block;
 }
 
-function visibleVariants(card) {
-  if (state.variant === "all" || card.category !== "お守り") return card.variants;
-  return card.variants.filter((variant) => variant.variant === state.variant);
-}
-
 function stampNames(ids) {
   if (!Array.isArray(ids)) return [];
   return ids.flatMap((id) => {
@@ -203,15 +196,9 @@ function cardIndex(card) {
   ].join(" "));
 }
 
-function hasEffectiveStamp(card, stampId) {
-  return EFFECTIVE_STAMP_STATES.has(safeStatus(card.stampStates?.[String(stampId)]));
-}
-
 function matches(card) {
   if (state.category !== "all" && card.category !== state.category) return false;
-  if (state.rarity !== "all" && card.rarity !== state.rarity) return false;
-  if (!visibleVariants(card).length) return false;
-  if (state.stampFilter !== "all" && !hasEffectiveStamp(card, state.stampFilter)) return false;
+  if (state.rarity !== "all" && (card.category !== "お守り" || card.rarity !== state.rarity)) return false;
   const words = normalize(state.query).trim().split(/\s+/).filter(Boolean);
   return words.every((word) => cardIndex(card).includes(word));
 }
@@ -288,7 +275,7 @@ function renderCard(card) {
   article.append(top);
 
   const body = element("div", "card-body");
-  for (const variant of visibleVariants(card)) body.append(renderVariant(card, variant));
+  for (const variant of card.variants) body.append(renderVariant(card, variant));
   article.append(body);
 
   const rules = renderRules(card);
@@ -351,7 +338,7 @@ function renderCard(card) {
 
 function render() {
   const filtered = state.cards.filter(matches);
-  const visibleCount = filtered.reduce((total, card) => total + visibleVariants(card).length, 0);
+  const visibleCount = filtered.reduce((total, card) => total + card.variants.length, 0);
   elements.grid.replaceChildren(...filtered.map(renderCard));
   elements.empty.hidden = filtered.length !== 0;
   elements.count.replaceChildren();
@@ -364,14 +351,20 @@ function resetFilters() {
   state.query = "";
   state.category = "all";
   state.rarity = "all";
-  state.variant = "all";
-  state.stampFilter = "all";
   elements.search.value = "";
   elements.category.value = "all";
   elements.rarity.value = "all";
-  elements.variant.value = "all";
-  elements.stampFilter.value = "all";
+  syncRarityField();
   render();
+}
+
+function syncRarityField() {
+  const visible = state.category === "all" || state.category === "お守り";
+  if (elements.rarityField) elements.rarityField.hidden = !visible;
+  if (!visible) {
+    state.rarity = "all";
+    elements.rarity.value = "all";
+  }
 }
 
 function populateSelect(select, values) {
@@ -388,7 +381,7 @@ function populateSelect(select, values) {
 }
 
 function hasActiveFilters() {
-  return Boolean(state.query || state.category !== "all" || state.rarity !== "all" || state.variant !== "all" || state.stampFilter !== "all");
+  return Boolean(state.query || state.category !== "all" || state.rarity !== "all");
 }
 
 function targetForHash(raw) {
@@ -432,10 +425,12 @@ function bindControls() {
   elements.clearSearch.addEventListener("click", () => { state.query = ""; elements.search.value = ""; render(); elements.search.focus(); });
   elements.reset.addEventListener("click", resetFilters);
   elements.emptyReset.addEventListener("click", resetFilters);
-  elements.category.addEventListener("change", (event) => { state.category = event.target.value; render(); });
+  elements.category.addEventListener("change", (event) => {
+    state.category = event.target.value;
+    syncRarityField();
+    render();
+  });
   elements.rarity.addEventListener("change", (event) => { state.rarity = event.target.value; render(); });
-  elements.variant.addEventListener("change", (event) => { state.variant = event.target.value; render(); });
-  elements.stampFilter.addEventListener("change", (event) => { state.stampFilter = event.target.value; render(); });
   window.addEventListener("hashchange", focusHash);
   document.addEventListener("click", handleCardLink);
   document.addEventListener("keydown", (event) => {
@@ -464,9 +459,10 @@ async function start() {
         const ai = RAIL_STAMP_IDS.indexOf(String(a.id));
         const bi = RAIL_STAMP_IDS.indexOf(String(b.id));
         return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi) || Number(a.id) - Number(b.id);
-      });
+    });
     populateSelect(elements.category, [...new Set(state.cards.map((card) => card.category))]);
-    populateSelect(elements.rarity, [...new Set(state.cards.map((card) => card.rarity))]);
+    populateSelect(elements.rarity, AMULET_RARITIES);
+    syncRarityField();
     bindControls();
     render();
     focusHash();

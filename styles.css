@@ -39,13 +39,13 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fo
 .hero::before, .hero::after { content: ""; position: absolute; pointer-events: none; border: 1px solid rgba(250, 223, 170, .23); border-radius: 50%; }
 .hero::before { width: 390px; height: 390px; right: -140px; top: -170px; }
 .hero::after { width: 250px; height: 250px; right: -55px; top: -100px; }
-.hero-kicker { display: flex; align-items: center; gap: 10px; color: #f0d8a4; font-size: 11px; letter-spacing: .18em; font-weight: 700; }
-.hero-seal { display: inline-grid; place-items: center; width: 38px; height: 38px; color: #173652; background: #e9c98c; border-radius: 50%; font-size: 11px; letter-spacing: .04em; box-shadow: inset 0 0 0 2px rgba(17, 46, 73, .22); }
-.hero-row { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-top: 17px; }
+.hero-row { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-top: 0; }
 .eyebrow { margin: 0 0 3px; color: #bda982; font-size: 11px; line-height: 1.4; letter-spacing: .16em; font-weight: 700; }
-.hero .eyebrow { color: #f0d8a4; }
 h1, h2, h3, p { overflow-wrap: anywhere; }
 h1 { margin: 0; color: #fffaf0; font-family: Georgia, "Hiragino Mincho ProN", "Yu Mincho", serif; font-size: clamp(2.05rem, 4vw, 3.35rem); line-height: 1.15; letter-spacing: .02em; font-weight: 600; }
+h1 .game-brand, h1 .game-season { display: block; overflow-wrap: anywhere; }
+h1 .game-season { margin-top: .22em; color: #f0d8a4; font-size: .7em; letter-spacing: .08em; font-weight: 500; }
+.catalogue-title { margin: 13px 0 0; color: #fffaf0; font-family: Georgia, "Hiragino Mincho ProN", "Yu Mincho", serif; font-size: clamp(1.35rem, 2.4vw, 2rem); line-height: 1.3; letter-spacing: .04em; font-weight: 600; }
 .hero-lede { max-width: 600px; margin: 15px 0 0; color: #d9e5e8; font-size: 15px; }
 .hero-stats { display: flex; flex: 0 0 auto; gap: 26px; margin: 0 0 3px; }
 .hero-stats div { min-width: 58px; padding-left: 14px; border-left: 1px solid rgba(251, 229, 183, .32); }
@@ -66,8 +66,9 @@ h1 { margin: 0; color: #fffaf0; font-family: Georgia, "Hiragino Mincho ProN", "Y
 .clear-search:hover { background: var(--blue-wash); }
 .reset-button, .secondary-button { height: 42px; padding: 0 15px; color: var(--navy); background: transparent; border: 1px solid var(--line-strong); border-radius: 9px; font-size: 13px; font-weight: 700; white-space: nowrap; }
 .reset-button:hover, .secondary-button:hover { border-color: var(--navy); background: var(--blue-wash); }
-.filter-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 15px; }
+.filter-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 15px; }
 .select-field { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; min-width: 0; color: var(--ink-soft); font-size: 12px; font-weight: 700; }
+.select-field[hidden] { display: none; }
 .select-field select { width: 100%; min-width: 0; height: 38px; padding: 0 30px 0 10px; color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 8px; }
 .toolbar-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; min-height: 33px; margin-top: 15px; }
 .legend { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
