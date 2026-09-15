@@ -1568,7 +1568,15 @@
       "notes": [
         {
           "kind": "correction",
-          "text": "日本語は魂牌の種類を参照するが、繁体字原文は所持するお化けお守りの枚数を参照し、係数は通常100・強化200とする。"
+          "text": "参照するのは、所持しているお化けのお守りの枚数。加点は1枚につき通常100PT・強化200PT。魂牌の種類数は参照しない。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "持有小鬼护身符数量的100倍",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・通常版"
+            }
+          ]
         }
       ],
       "rules": [],
@@ -1666,12 +1674,7 @@
           "publicSourceURL": "https://github.com/Avenshy/MajsoulData/blob/02f12956bb17a034673b27cbb4d9b1c7ab73cdd4/raw/lua/LuaByte/Lua/Excels/Langs/str_event_jp.lua"
         }
       ],
-      "notes": [
-        {
-          "kind": "correction",
-          "text": "日本語は打牌した「枚数ぶんの点数」、繁体字原文はその牌の「点数」を獲得する記述。両者の参照対象が異なる。"
-        }
-      ],
+      "notes": [],
       "rules": [],
       "stampStates": {
         "600160": "active",
@@ -2969,15 +2972,26 @@
           "publicSourceURL": "https://github.com/Avenshy/MajsoulData/blob/02f12956bb17a034673b27cbb4d9b1c7ab73cdd4/raw/lua/LuaByte/Lua/Excels/Langs/str_event_jp.lua"
         }
       ],
-      "notes": [],
+      "notes": [
+        {
+          "kind": "correction",
+          "text": "数えるのは索子でのツモ和了回数。索子を引いただけでは進まず、13回のツモ和了で成長する。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "自摸和牌13张索子牌后",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・通常版"
+            }
+          ]
+        }
+      ],
       "rules": [],
       "stampStates": {
-        "600190": "effectless",
-        "600310": "effectless"
+        "600190": "effectless"
       },
       "stampReasons": {
-        "600190": "自己成長の獲得処理がない。牌・役の育成や固定出力は対象外。",
-        "600310": "和了時に追加する本体処理がない。悪魔の自傷は別に発生する。"
+        "600190": "自己成長の獲得処理がない。牌・役の育成や固定出力は対象外。"
       }
     },
     {
@@ -3740,7 +3754,26 @@
           "publicSourceURL": "https://github.com/Avenshy/MajsoulData/blob/02f12956bb17a034673b27cbb4d9b1c7ab73cdd4/raw/lua/LuaByte/Lua/Excels/Langs/str_event_jp.lua"
         }
       ],
-      "notes": [],
+      "notes": [
+        {
+          "kind": "correction",
+          "text": "最初の和了を含む合計回数は、通常2回・強化3回。「さらに2回／3回」という日本語本文は追加回数として読むと1回多くなる。",
+          "quotes": [
+            {
+              "language": "en",
+              "text": "that win counts as 2 wins",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_en.lua",
+              "label": "英語原文・通常版"
+            },
+            {
+              "language": "en",
+              "text": "that win counts as 3 wins",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_en.lua",
+              "label": "英語原文・強化版"
+            }
+          ]
+        }
+      ],
       "rules": [],
       "stampStates": {
         "600180": "conditional",
@@ -3779,7 +3812,20 @@
           "publicSourceURL": "https://github.com/Avenshy/MajsoulData/blob/02f12956bb17a034673b27cbb4d9b1c7ab73cdd4/raw/lua/LuaByte/Lua/Excels/Langs/str_event_jp.lua"
         }
       ],
-      "notes": [],
+      "notes": [
+        {
+          "kind": "correction",
+          "text": "強化版は、受けるはずのダメージを6回復に置き換える。ダメージを受けた後に6回復する処理ではない。所持上限で発動しない条件は通常版と共通。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "每当受到伤害时，改为恢复6点生命值",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・強化版"
+            }
+          ]
+        }
+      ],
       "rules": [],
       "stampStates": {
         "600180": "conditional",
@@ -4180,8 +4226,16 @@
       ],
       "notes": [
         {
-          "kind": "exception",
-          "text": "ウロボロス＋はブラックホールの増加を増幅せず、キラキラ小悪魔ちゃんの増加には作用した。姫川響と同じ増幅範囲として扱わない。"
+          "kind": "correction",
+          "text": "「1」と「9」の数牌の基礎スコアを、通常3倍・強化5倍として計算する。育成による増加量を増幅する効果ではない。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "基础分值计为3倍",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・通常版"
+            }
+          ]
         }
       ],
       "rules": [],
@@ -4491,7 +4545,15 @@
       "notes": [
         {
           "kind": "correction",
-          "text": "{0}には発動する効果、{1}にはその後の変化先が入る。両方を数値として読むテンプレートではない。"
+          "text": "各ステージの終了時に、回復とダメージを交互に1つずつ実行する。通常版なら12回復→次のステージで6ダメージ→次のステージで12回復…となる。同じ終了時に両方を実行する意味ではない。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "然后变为{1}",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・通常版"
+            }
+          ]
         }
       ],
       "rules": [],
@@ -4581,7 +4643,20 @@
           "publicSourceURL": "https://github.com/Avenshy/MajsoulData/blob/02f12956bb17a034673b27cbb4d9b1c7ab73cdd4/raw/lua/LuaByte/Lua/Excels/Langs/str_event_jp.lua"
         }
       ],
-      "notes": [],
+      "notes": [
+        {
+          "kind": "correction",
+          "text": "清一色が成立するたび、その基礎翻数が通常3・強化6増え、この挑戦中は持続する。今回の和了だけの加点ではない。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "本轮游戏中清一色役种基础番数+3",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・通常版"
+            }
+          ]
+        }
+      ],
       "rules": [],
       "stampStates": {
         "600160": "active",
@@ -4674,7 +4749,15 @@
       "notes": [
         {
           "kind": "correction",
-          "text": "繁体字原文では「このステージ内」と明記されている。日本語本文では効果の継続範囲が省かれている。"
+          "text": "増えた役満の翻数が有効なのは、このステージ中だけ。次のステージには持ち越さない。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "所有役满役种在本关卡内额外+64番",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・通常版"
+            }
+          ]
         }
       ],
       "rules": [],
@@ -4812,7 +4895,15 @@
       "notes": [
         {
           "kind": "correction",
-          "text": "繁体字原文は「今回の挑戦中のお守りの強化回数」。日本語の「このお守りの強化回数」と集計範囲の表現が異なる。"
+          "text": "参照するのは、この挑戦中に行ったお守りの強化の累計回数。磁力兵士自身だけの強化回数ではない。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "本局游戏中护身符的升级次数",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・通常版"
+            }
+          ]
         }
       ],
       "rules": [],
@@ -5183,19 +5274,32 @@
           "publicSourceURL": "https://github.com/Avenshy/MajsoulData/blob/02f12956bb17a034673b27cbb4d9b1c7ab73cdd4/raw/lua/LuaByte/Lua/Excels/Langs/str_event_jp.lua"
         }
       ],
-      "notes": [],
+      "notes": [
+        {
+          "kind": "correction",
+          "text": "成長するのは魂牌でツモ和了した時。魂牌を引いただけでは成長しない。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "和牌时，如果自摸的是魂牌",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・通常版"
+            }
+          ]
+        }
+      ],
       "rules": [],
       "stampStates": {
         "600160": "active",
         "600180": "active",
         "600190": "active",
-        "600310": "conditional"
+        "600310": "active"
       },
       "stampReasons": {
         "600160": "本体の発動を追加する。",
         "600180": "空き枠に別個体を作り、その個体が効果を発動する。",
         "600190": "お守り自身が蓄積する効果の増分を2倍にする。",
-        "600310": "和了時の得点出力に適用。入替・入手・終了時など別の契機で得る成長は増やさない。"
+        "600310": "和了時の本体処理を追加する。本体の発動条件は維持する。"
       }
     },
     {
@@ -5229,7 +5333,15 @@
       "notes": [
         {
           "kind": "correction",
-          "text": "和了牌への変換がある場合、索子判定は変換後の牌を見る。冬実が元のツモ牌を見ることと区別する。追加和了でも成長する。"
+          "text": "成長するのは索子でツモ和了した時。引いただけでは成長しない。和了牌への変換がある場合は変換後の牌を判定し、追加和了でも成長する。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "和牌时，如果自摸的是索子",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・通常版"
+            }
+          ]
         },
         {
           "kind": "interaction",
@@ -6072,12 +6184,7 @@
           "publicSourceURL": "https://github.com/Avenshy/MajsoulData/blob/02f12956bb17a034673b27cbb4d9b1c7ab73cdd4/raw/lua/LuaByte/Lua/Excels/Langs/str_event_jp.lua"
         }
       ],
-      "notes": [
-        {
-          "kind": "correction",
-          "text": "強化版の「レジェンドレア」は日本語の通常のレア度表記と一致しない。繁体字原文は通常「傳說」、強化「神話」。"
-        }
-      ],
+      "notes": [],
       "rules": [],
       "stampStates": {
         "600190": "effectless",
@@ -6502,7 +6609,20 @@
           "publicSourceURL": "https://github.com/Avenshy/MajsoulData/blob/02f12956bb17a034673b27cbb4d9b1c7ab73cdd4/raw/lua/LuaByte/Lua/Excels/Langs/str_event_jp.lua"
         }
       ],
-      "notes": [],
+      "notes": [
+        {
+          "kind": "correction",
+          "text": "数えるのは所持お守りのレア度の種類数。同じレア度のお守りを増やしても、そのレア度による獲得量は増えない。",
+          "quotes": [
+            {
+              "language": "en",
+              "text": "for each different talisman rarity you hold",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_en.lua",
+              "label": "英語原文・通常版"
+            }
+          ]
+        }
+      ],
       "rules": [],
       "stampStates": {
         "600160": "active",
@@ -6688,7 +6808,15 @@
       "notes": [
         {
           "kind": "correction",
-          "text": "繁体字原文は「2倍量／3倍量の飜数を獲得」。日本語の「x2／x3飜」と表現が異なる。"
+          "text": "獲得する倍率の増分は、無効化したダメージ量×2（強化版は×3）。例えば4ダメージを無効化すると、倍率に通常8・強化12を加える。",
+          "quotes": [
+            {
+              "language": "en",
+              "text": "Han equal to 2x the negated DMG",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_en.lua",
+              "label": "英語原文・通常版"
+            }
+          ]
         }
       ],
       "rules": [],
@@ -6903,12 +7031,7 @@
           "publicSourceURL": "https://github.com/Avenshy/MajsoulData/blob/02f12956bb17a034673b27cbb4d9b1c7ab73cdd4/raw/lua/LuaByte/Lua/Excels/Langs/str_event_jp.lua"
         }
       ],
-      "notes": [
-        {
-          "kind": "interaction",
-          "text": "ウロボロス＋は、キラキラ小悪魔ちゃんによる一・九牌への加点を増幅する。"
-        }
-      ],
+      "notes": [],
       "rules": [],
       "stampStates": {
         "600160": "active",
@@ -7001,17 +7124,30 @@
           "publicSourceURL": "https://github.com/Avenshy/MajsoulData/blob/02f12956bb17a034673b27cbb4d9b1c7ab73cdd4/raw/lua/LuaByte/Lua/Excels/Langs/str_event_jp.lua"
         }
       ],
-      "notes": [],
+      "notes": [
+        {
+          "kind": "correction",
+          "text": "条件を満たすと、非役の翻数にロック牌数×1.5（強化版は×2）を加算し、この挑戦中は持続する。既存値の置換ではない。非役とはドラ・赤ドラ・魂牌・ロック牌を指す。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "使本轮游戏中非役种类番数增加等同于锁定牌1.5倍数量的番数",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・通常版"
+            }
+          ]
+        }
+      ],
       "rules": [],
       "stampStates": {
-        "600160": "effectless",
-        "600180": "effectless",
+        "600160": "active",
+        "600180": "active",
         "600190": "effectless",
         "600310": "effectless"
       },
       "stampReasons": {
-        "600160": "同じ対象への変換・固定・上限指定は重ねても増えない。",
-        "600180": "別個体にしても同じ固定指定が重なる。",
+        "600160": "条件成立時の非役翻数への加算を追加する。",
+        "600180": "コピーも条件成立時に非役翻数へ加算する。",
         "600190": "自己成長の獲得処理がない。牌・役の育成や固定出力は対象外。",
         "600310": "和了時に追加する本体処理がない。悪魔の自傷は別に発生する。"
       }
@@ -7458,7 +7594,7 @@
       "notes": [
         {
           "kind": "exception",
-          "text": "ハッキング先の効果にはリン自身の印が適用される。こだまで作ったリンのコピーはハッキングせず、働かなかったという検証報告がある。"
+          "text": "ハッキング先の効果にはリン自身の印が適用される。自分自身も抽選対象で、自分自身に変化した場合はそれ以上何もしない。こだまで作ったリンのコピーが働かなかったという検証報告もある。"
         }
       ],
       "rules": [],
@@ -8104,7 +8240,20 @@
           "publicSourceURL": "https://github.com/Avenshy/MajsoulData/blob/02f12956bb17a034673b27cbb4d9b1c7ab73cdd4/raw/lua/LuaByte/Lua/Excels/Langs/str_event_jp.lua"
         }
       ],
-      "notes": [],
+      "notes": [
+        {
+          "kind": "correction",
+          "text": "元の最大HPを基準に、現在HPの上限を通常1/2・強化1/3に制限する。最大HPそのものを書き換える効果ではない。",
+          "quotes": [
+            {
+              "language": "chs",
+              "text": "生命值最高可达到上限的1/2",
+              "sourceURL": "https://raw.githubusercontent.com/Avenshy/MajsoulData/c2b5df0c163a925469f536cb08c738f354b36d00/raw/lua/LuaByte/Lua/Excels/Langs/str_event_chs.lua",
+              "label": "簡体中文原文・通常版"
+            }
+          ]
+        }
+      ],
       "rules": [],
       "stampStates": {
         "600190": "effectless"

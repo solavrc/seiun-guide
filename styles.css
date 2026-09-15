@@ -140,18 +140,20 @@ h1 { margin: 0; color: #fffaf0; font-family: Georgia, "Hiragino Mincho ProN", "Y
 .stamp-rules-heading { margin: 0 0 5px; color: var(--navy); font-size: 12px; font-weight: 800; letter-spacing: .04em; }
 .stamp-rules-list { display: grid; gap: 5px; margin: 0; padding-left: 1.25em; font-size: 13px; line-height: 1.65; }
 .card-notes { margin: 0 17px 16px; padding: 0 13px 11px; background: #f7f5ef; border: 1px solid #e5e0d4; border-radius: 11px; }
-.card-notes summary { display: flex; align-items: center; gap: 6px; padding: 11px 0 6px; color: var(--navy); cursor: pointer; font-size: 12px; font-weight: 800; letter-spacing: .04em; list-style-position: inside; }
-.card-notes summary::marker { color: var(--gold); }
-.card-notes[open] summary { margin-bottom: 1px; }
+.card-notes-heading, .all-stamps-heading { display: flex; align-items: center; gap: 6px; margin: 0; padding: 11px 0 6px; color: var(--navy); font-size: 12px; font-weight: 800; letter-spacing: .04em; }
 .note-content { padding-bottom: 1px; }
 .note-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .note-item { display: block; color: #4c5964; font-size: 13px; line-height: 1.7; }
+.note-text { margin: 0; }
 .note-kind { display: inline-block; margin-right: 6px; padding: 1px 5px; border: 1px solid transparent; border-radius: 4px; font-size: 10px; line-height: 1.4; font-weight: 800; vertical-align: baseline; }
 .note-kind-correction { color: #7d4b23; background: #f8ecd7; border-color: #ead5ae; }
 .note-kind-interaction { color: #245d6e; background: #e6f1f3; border-color: #c7dfe4; }
 .note-kind-exception { color: #674b79; background: #eee7f2; border-color: #d9cbe1; }
+.note-quote { margin: 7px 0 0; padding: 5px 9px; color: #68737b; border-left: 2px solid #c9d2d1; font-size: 12px; line-height: 1.55; }
+.note-quote-text { margin: 0; white-space: pre-wrap; }
+.note-quote-cite { display: block; margin-top: 2px; font-size: 11px; font-style: normal; }
+.note-quote-cite a { color: #627b83; text-decoration: underline; text-underline-offset: 2px; }
 .all-stamps { margin: 0 17px 16px; padding: 0 13px 11px; background: #f7f5ef; border: 1px solid #e5e0d4; border-radius: 11px; }
-.all-stamps summary { padding-top: 10px; color: var(--navy); cursor: pointer; font-size: 12px; font-weight: 800; }
 .all-stamp-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px 5px; padding-top: 10px; }
 .all-stamp-item { display: grid; justify-items: center; gap: 3px; min-width: 0; color: var(--ink-soft); font-size: 9px; line-height: 1.25; text-align: center; }
 .all-stamp-item .stamp-badge { width: 28px; height: 28px; }

@@ -142,23 +142,45 @@ function stampRow(card, { compact = false } = {}) {
 function allStampPanel(card) {
   const stored = state.stamps.filter((stamp) => safeStatus(card.stampStates?.[String(stamp.id)]));
   if (!stored.length || stored.every((stamp) => PRIORITY_STAMP_IDS.includes(String(stamp.id)))) return null;
-  const details = document.createElement("details");
-  details.className = "all-stamps";
-  const summary = document.createElement("summary");
-  summary.textContent = "すべての印の状態を表示";
-  details.append(summary);
+  const panel = element("section", "all-stamps");
+  const heading = element("h4", "all-stamps-heading", "すべての印の状態を表示");
+  heading.id = `all-stamps-${card.id}`;
+  panel.setAttribute("aria-labelledby", heading.id);
+  panel.append(heading);
   const grid = element("div", "all-stamp-grid");
   for (const stamp of stored) {
     const item = element("div", "all-stamp-item");
-    const details = groupStampDetails(card, stamp.id);
-    const badge = stampBadge(stamp, details.status, { compact: true, reason: details.reason });
+    const stampDetails = groupStampDetails(card, stamp.id);
+    const badge = stampBadge(stamp, stampDetails.status, { compact: true, reason: stampDetails.reason });
     if (!badge) continue;
     item.append(badge);
     item.append(element("span", "", stamp.name.replace(/の印$/, "")));
     grid.append(item);
   }
-  details.append(grid);
-  return details;
+  panel.append(grid);
+  return panel;
+}
+
+function safeQuoteSourceURL(value) {
+  return typeof value === "string" && value.startsWith("https://raw.githubusercontent.com/Avenshy/MajsoulData/") && !/[?#]/.test(value) ? value : "";
+}
+
+function renderQuote(quote) {
+  const text = typeof quote?.text === "string" ? quote.text.trim() : "";
+  const label = typeof quote?.label === "string" ? quote.label.trim() : "";
+  const sourceURL = safeQuoteSourceURL(quote?.sourceURL);
+  if (!text || !label || !sourceURL) return null;
+  const block = element("blockquote", "note-quote");
+  block.append(element("p", "note-quote-text", text));
+  const cite = element("cite", "note-quote-cite");
+  const source = document.createElement("a");
+  source.href = sourceURL;
+  source.target = "_blank";
+  source.rel = "noreferrer noopener";
+  source.textContent = label;
+  cite.append(source);
+  block.append(cite);
+  return block;
 }
 
 function visibleVariants(card) {
@@ -179,6 +201,7 @@ function cardIndex(card) {
       ...(variant.dynamicMarkers ?? []),
     ]),
     ...(card.notes ?? []).map((note) => note.text),
+    ...(card.notes ?? []).flatMap((note) => (Array.isArray(note.quotes) ? note.quotes : []).flatMap((quote) => [quote.text, quote.label])),
     ...(card.rules ?? []),
     ...Object.values(card.stampReasons ?? {}),
   ].join(" "));
@@ -282,23 +305,29 @@ function renderCard(card) {
 
   const notes = Array.isArray(card.notes) ? card.notes.filter((note) => note && typeof note.text === "string" && note.text.trim() && Object.hasOwn(NOTE_KIND_LABELS, note.kind)) : [];
   if (notes.length) {
-    const noteDetails = document.createElement("details");
-    noteDetails.className = "card-notes";
-    const summary = document.createElement("summary");
-    summary.textContent = `▱  備考（${notes.length}件）`;
-    noteDetails.append(summary);
+    const noteSection = element("section", "card-notes");
+    const heading = element("h4", "card-notes-heading", `▱  備考（${notes.length}件）`);
+    heading.id = `notes-${firstId}`;
+    noteSection.setAttribute("aria-labelledby", heading.id);
+    noteSection.append(heading);
     const noteContent = element("div", "note-content");
     const list = element("ul", "note-list");
     for (const note of notes) {
       const item = element("li", "note-item");
+      const noteText = element("p", "note-text");
       const kind = noteKindChip(note.kind);
-      if (kind) item.append(kind);
-      item.append(document.createTextNode(note.text.trim()));
+      if (kind) noteText.append(kind);
+      noteText.append(document.createTextNode(note.text.trim()));
+      item.replaceChildren(noteText);
+      for (const quote of Array.isArray(note.quotes) ? note.quotes : []) {
+        const block = renderQuote(quote);
+        if (block) item.append(block);
+      }
       list.append(item);
     }
     noteContent.append(list);
-    noteDetails.append(noteContent);
-    article.append(noteDetails);
+    noteSection.append(noteContent);
+    article.append(noteSection);
   }
   if (card.category === "お守り") {
     const panel = allStampPanel(card);
