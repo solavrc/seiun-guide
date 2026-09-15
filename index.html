@@ -42,15 +42,13 @@
             <label class="select-field"><span>種類</span><select id="category-filter" aria-label="種類で絞り込む"><option value="all">すべて</option></select></label>
             <label class="select-field"><span>レア度・区分</span><select id="rarity-filter" aria-label="レア度・区分で絞り込む"><option value="all">すべて</option></select></label>
             <label class="select-field"><span>版</span><select id="variant-filter" aria-label="版で絞り込む"><option value="all">通常・＋</option><option value="通常">通常のみ</option><option value="＋">＋のみ</option></select></label>
-            <label class="select-field"><span>印状態</span><select id="status-filter" aria-label="印状態で絞り込む"><option value="all">すべて</option><option value="active">適用</option><option value="conditional">一部適用</option><option value="effectless">対象外</option><option value="unavailable">付与不可</option></select></label>
+            <label class="select-field"><span>有効な印</span><select id="stamp-filter" aria-label="有効な印で絞り込む"><option value="all">すべて</option><option value="600190">天使の印</option><option value="600310">悪魔の印</option></select></label>
           </div>
           <div class="toolbar-row">
-            <div class="legend" aria-label="印状態の凡例">
-              <span class="legend-label">印状態</span>
+            <div class="legend" aria-label="右上の印アイコンの凡例">
+              <span class="legend-label">右上の印</span>
               <span class="status-chip status-active"><b aria-hidden="true">✓</b> 適用</span>
               <span class="status-chip status-conditional"><b aria-hidden="true">~</b> 一部適用</span>
-              <span class="status-chip status-effectless"><b aria-hidden="true">−</b> 対象外</span>
-              <span class="status-chip status-unavailable"><b aria-hidden="true">×</b> 付与不可</span>
             </div>
             <p class="result-count" id="result-count" role="status" aria-live="polite"></p>
           </div>
@@ -61,7 +59,7 @@
         <section class="catalogue-section" aria-labelledby="catalogue-heading">
           <div class="section-heading">
             <div><p class="eyebrow">THE COLLECTION</p><h2 id="catalogue-heading">収録カード</h2></div>
-            <p class="section-hint">印は各お守りに共通ルールを適用した表示です。右上のアイコンから印の説明へ。一部適用は、本体の一部の効果が対象です。</p>
+            <p class="section-hint">右上は有効な天使・悪魔のみ。備考の印は、その説明に関係する印です。各アイコンから共通ルールを参照できます。</p>
           </div>
           <div id="card-grid" class="card-grid" aria-live="polite"></div>
           <div id="empty-state" class="empty-state" hidden>

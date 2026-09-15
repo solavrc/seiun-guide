@@ -1,16 +1,13 @@
 const STATUS_LABELS = Object.freeze({
   active: "適用",
   conditional: "一部適用",
-  effectless: "対象外",
-  unavailable: "付与不可",
 });
 
-const PRIORITY_STAMP_IDS = ["600160", "600180", "600190", "600310"];
+const RAIL_STAMP_IDS = ["600190", "600310"];
+const EFFECTIVE_STAMP_STATES = new Set(["active", "conditional"]);
 const STATUS_MARKS = Object.freeze({
   active: "✓",
   conditional: "~",
-  effectless: "−",
-  unavailable: "×",
 });
 const NOTE_KIND_LABELS = Object.freeze({
   correction: "訂正",
@@ -25,7 +22,7 @@ const state = {
   category: "all",
   rarity: "all",
   variant: "all",
-  status: "all",
+  stampFilter: "all",
 };
 
 const elements = {
@@ -39,7 +36,7 @@ const elements = {
   category: document.querySelector("#category-filter"),
   rarity: document.querySelector("#rarity-filter"),
   variant: document.querySelector("#variant-filter"),
-  status: document.querySelector("#status-filter"),
+  stampFilter: document.querySelector("#stamp-filter"),
   count: document.querySelector("#result-count"),
 };
 
@@ -106,11 +103,12 @@ function stampBadge(stamp, status, { compact = false, reason = "" } = {}) {
   return badge;
 }
 
-function stampRuleLink(stamp) {
+function stampReferenceLink(stamp) {
   if (!stamp) return null;
-  const label = `${stamp.name ?? `印 ${stamp.id ?? ""}`}の共通ルール`;
+  const name = stamp.name ?? `印 ${stamp.id ?? ""}`;
+  const label = `関連印：${name}のページ`;
   const link = document.createElement("a");
-  link.className = "stamp-badge stamp-badge-rule";
+  link.className = "stamp-reference-link";
   link.href = `#card-${stamp.id}`;
   link.setAttribute("aria-label", label);
   link.setAttribute("title", label);
@@ -121,44 +119,21 @@ function stampRuleLink(stamp) {
     image.loading = "lazy";
     link.append(image);
   }
+  link.append(element("span", "stamp-reference-name", name.replace(/の印$/, "")));
   return link;
 }
 
-function stampRow(card, { compact = false } = {}) {
-  const rail = element("div", compact ? "stamp-rail" : "variant-stamps");
-  if (!compact) rail.append(element("span", "variant-stamps-label", "印状態"));
-  for (const stampId of PRIORITY_STAMP_IDS) {
+function stampRow(card) {
+  const rail = element("div", "stamp-rail");
+  for (const stampId of RAIL_STAMP_IDS) {
     const stamp = stampFor(stampId);
     if (!stamp) continue;
     const details = groupStampDetails(card, stampId);
-    const badge = details.status
-      ? stampBadge(stamp, details.status, { compact, reason: details.reason })
-      : stampRuleLink(stamp);
+    if (!EFFECTIVE_STAMP_STATES.has(details.status)) continue;
+    const badge = stampBadge(stamp, details.status, { compact: true, reason: details.reason });
     if (badge) rail.append(badge);
   }
   return rail.children.length ? rail : null;
-}
-
-function allStampPanel(card) {
-  const stored = state.stamps.filter((stamp) => safeStatus(card.stampStates?.[String(stamp.id)]));
-  if (!stored.length || stored.every((stamp) => PRIORITY_STAMP_IDS.includes(String(stamp.id)))) return null;
-  const panel = element("section", "all-stamps");
-  const heading = element("h4", "all-stamps-heading", "すべての印の状態を表示");
-  heading.id = `all-stamps-${card.id}`;
-  panel.setAttribute("aria-labelledby", heading.id);
-  panel.append(heading);
-  const grid = element("div", "all-stamp-grid");
-  for (const stamp of stored) {
-    const item = element("div", "all-stamp-item");
-    const stampDetails = groupStampDetails(card, stamp.id);
-    const badge = stampBadge(stamp, stampDetails.status, { compact: true, reason: stampDetails.reason });
-    if (!badge) continue;
-    item.append(badge);
-    item.append(element("span", "", stamp.name.replace(/の印$/, "")));
-    grid.append(item);
-  }
-  panel.append(grid);
-  return panel;
 }
 
 function safeQuoteSourceURL(value) {
@@ -188,6 +163,23 @@ function visibleVariants(card) {
   return card.variants.filter((variant) => variant.variant === state.variant);
 }
 
+function stampNames(ids) {
+  if (!Array.isArray(ids)) return [];
+  return ids.flatMap((id) => {
+    const stamp = stampFor(id);
+    return stamp ? [stamp.name] : [];
+  });
+}
+
+function railSearchTerms(card) {
+  return RAIL_STAMP_IDS.flatMap((stampId) => {
+    const details = groupStampDetails(card, stampId);
+    if (!EFFECTIVE_STAMP_STATES.has(details.status)) return [];
+    const stamp = stampFor(stampId);
+    return stamp ? [stamp.name, details.reason] : [details.reason];
+  });
+}
+
 function cardIndex(card) {
   return normalize([
     card.name,
@@ -200,27 +192,26 @@ function cardIndex(card) {
       variant.text,
       ...(variant.dynamicMarkers ?? []),
     ]),
-    ...(card.notes ?? []).map((note) => note.text),
-    ...(card.notes ?? []).flatMap((note) => (Array.isArray(note.quotes) ? note.quotes : []).flatMap((quote) => [quote.text, quote.label])),
+    ...(card.notes ?? []).flatMap((note) => [
+      note.title,
+      note.text,
+      ...stampNames(note.stampIds),
+      ...(Array.isArray(note.quotes) ? note.quotes : []).flatMap((quote) => [quote.text, quote.label]),
+    ]),
     ...(card.rules ?? []),
-    ...Object.values(card.stampReasons ?? {}),
+    ...railSearchTerms(card),
   ].join(" "));
 }
 
-function cardStatuses(card) {
-  const statuses = new Set();
-  for (const value of Object.values(card.stampStates ?? {})) {
-    const status = safeStatus(value);
-    if (status) statuses.add(status);
-  }
-  return statuses;
+function hasEffectiveStamp(card, stampId) {
+  return EFFECTIVE_STAMP_STATES.has(safeStatus(card.stampStates?.[String(stampId)]));
 }
 
 function matches(card) {
   if (state.category !== "all" && card.category !== state.category) return false;
   if (state.rarity !== "all" && card.rarity !== state.rarity) return false;
   if (!visibleVariants(card).length) return false;
-  if (state.status !== "all" && !cardStatuses(card).has(state.status)) return false;
+  if (state.stampFilter !== "all" && !hasEffectiveStamp(card, state.stampFilter)) return false;
   const words = normalize(state.query).trim().split(/\s+/).filter(Boolean);
   return words.every((word) => cardIndex(card).includes(word));
 }
@@ -284,7 +275,7 @@ function renderCard(card) {
   head.append(element("span", "card-id", `ID ${firstId}${card.variants.length > 1 ? ` · ${card.variants.length}版` : ""}`));
   top.append(head);
   if (card.category === "お守り") {
-    const rail = stampRow(card, { compact: true });
+    const rail = stampRow(card);
     if (rail) top.append(rail);
   }
   const link = document.createElement("a");
@@ -314,24 +305,34 @@ function renderCard(card) {
     const list = element("ul", "note-list");
     for (const note of notes) {
       const item = element("li", "note-item");
+      const title = typeof note.title === "string" ? note.title.trim() : "";
       const noteText = element("p", "note-text");
-      const kind = noteKindChip(note.kind);
+      const kind = title ? null : noteKindChip(note.kind);
       if (kind) noteText.append(kind);
       noteText.append(document.createTextNode(note.text.trim()));
-      item.replaceChildren(noteText);
+      if (title) item.append(element("h5", "note-title", title));
+      item.append(noteText);
       for (const quote of Array.isArray(note.quotes) ? note.quotes : []) {
         const block = renderQuote(quote);
         if (block) item.append(block);
       }
+      const related = element("div", "note-stamp-links");
+      const relatedStamps = new Set();
+      for (const stampId of Array.isArray(note.stampIds) ? note.stampIds : []) {
+        const key = String(stampId);
+        if (relatedStamps.has(key)) continue;
+        const stamp = stampFor(stampId);
+        const link = stampReferenceLink(stamp);
+        if (!link) continue;
+        relatedStamps.add(key);
+        related.append(link);
+      }
+      if (related.children.length) item.append(related);
       list.append(item);
     }
     noteContent.append(list);
     noteSection.append(noteContent);
     article.append(noteSection);
-  }
-  if (card.category === "お守り") {
-    const panel = allStampPanel(card);
-    if (panel) article.append(panel);
   }
 
   const source = card.variants[0]?.publicSourceURL;
@@ -364,12 +365,12 @@ function resetFilters() {
   state.category = "all";
   state.rarity = "all";
   state.variant = "all";
-  state.status = "all";
+  state.stampFilter = "all";
   elements.search.value = "";
   elements.category.value = "all";
   elements.rarity.value = "all";
   elements.variant.value = "all";
-  elements.status.value = "all";
+  elements.stampFilter.value = "all";
   render();
 }
 
@@ -387,7 +388,7 @@ function populateSelect(select, values) {
 }
 
 function hasActiveFilters() {
-  return Boolean(state.query || state.category !== "all" || state.rarity !== "all" || state.variant !== "all" || state.status !== "all");
+  return Boolean(state.query || state.category !== "all" || state.rarity !== "all" || state.variant !== "all" || state.stampFilter !== "all");
 }
 
 function targetForHash(raw) {
@@ -434,7 +435,7 @@ function bindControls() {
   elements.category.addEventListener("change", (event) => { state.category = event.target.value; render(); });
   elements.rarity.addEventListener("change", (event) => { state.rarity = event.target.value; render(); });
   elements.variant.addEventListener("change", (event) => { state.variant = event.target.value; render(); });
-  elements.status.addEventListener("change", (event) => { state.status = event.target.value; render(); });
+  elements.stampFilter.addEventListener("change", (event) => { state.stampFilter = event.target.value; render(); });
   window.addEventListener("hashchange", focusHash);
   document.addEventListener("click", handleCardLink);
   document.addEventListener("keydown", (event) => {
@@ -460,8 +461,8 @@ async function start() {
       .filter((card) => card.category === "印")
       .map((card) => ({ ...card.variants[0], image: card.image, id: card.variants[0]?.id ?? card.id, name: card.name }))
       .sort((a, b) => {
-        const ai = PRIORITY_STAMP_IDS.indexOf(String(a.id));
-        const bi = PRIORITY_STAMP_IDS.indexOf(String(b.id));
+        const ai = RAIL_STAMP_IDS.indexOf(String(a.id));
+        const bi = RAIL_STAMP_IDS.indexOf(String(b.id));
         return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi) || Number(a.id) - Number(b.id);
       });
     populateSelect(elements.category, [...new Set(state.cards.map((card) => card.category))]);
