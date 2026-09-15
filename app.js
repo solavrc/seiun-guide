@@ -176,7 +176,7 @@ function railSearchTerms(card) {
     const details = groupStampDetails(card, stampId);
     if (!EFFECTIVE_STAMP_STATES.has(details.status)) return [];
     const stamp = stampFor(stampId);
-    return stamp ? [stamp.name, details.reason] : [details.reason];
+    return stamp ? [stamp.name] : [];
   });
 }
 
