@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="青雲の志のお守り・印・ルーン石を、画像と原文で読む公開図鑑" />
+    <title>青雲の志 — お守り図鑑</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#catalog">本文へ移動</a>
+    <div class="site-shell">
+      <header class="hero" aria-labelledby="page-title">
+        <div class="hero-kicker"><span class="hero-seal" aria-hidden="true">青雲</span><span>ILLUSTRATED REFERENCE</span></div>
+        <div class="hero-row">
+          <div class="hero-copy">
+            <p class="eyebrow">失われた聖餌</p>
+            <h1 id="page-title">お守りと印の図鑑</h1>
+            <p class="hero-lede">通常版と強化版の原文を並べ、印の働きと組み合わせを備考で確かめる図鑑。</p>
+          </div>
+          <dl class="hero-stats" aria-label="収録数">
+            <div><dt>図柄</dt><dd>233</dd></div>
+            <div><dt>本文</dt><dd>414</dd></div>
+            <div><dt>画像</dt><dd>233</dd></div>
+          </dl>
+        </div>
+        <div class="hero-rule" aria-hidden="true"><span></span><span></span><span></span></div>
+      </header>
+
+      <main id="catalog">
+        <section class="controls" aria-label="図鑑を検索・絞り込み">
+          <div class="search-row">
+            <label class="search-field" for="search-input">
+              <span class="search-glyph" aria-hidden="true">⌕</span>
+              <span class="sr-only">名前・本文・備考を検索</span>
+              <input id="search-input" type="search" autocomplete="off" placeholder="名前・本文・備考を検索" />
+              <button class="clear-search" id="clear-search" type="button" aria-label="検索語を消す" hidden>×</button>
+            </label>
+            <button class="reset-button" id="reset-button" type="button">条件をリセット</button>
+          </div>
+          <div class="filter-row">
+            <label class="select-field"><span>種類</span><select id="category-filter" aria-label="種類で絞り込む"><option value="all">すべて</option></select></label>
+            <label class="select-field"><span>レア度・区分</span><select id="rarity-filter" aria-label="レア度・区分で絞り込む"><option value="all">すべて</option></select></label>
+            <label class="select-field"><span>版</span><select id="variant-filter" aria-label="版で絞り込む"><option value="all">通常・＋</option><option value="通常">通常のみ</option><option value="＋">＋のみ</option></select></label>
+            <label class="select-field"><span>印状態</span><select id="status-filter" aria-label="印状態で絞り込む"><option value="all">すべて</option><option value="active">有効</option><option value="conditional">条件付き</option><option value="effectless">効果なし</option><option value="unavailable">付与不可</option><option value="unknown">未確認</option></select></label>
+          </div>
+          <div class="toolbar-row">
+            <div class="legend" aria-label="印状態の凡例">
+              <span class="legend-label">印状態</span>
+              <span class="status-chip status-active"><b aria-hidden="true">✓</b> 有効</span>
+              <span class="status-chip status-conditional"><b aria-hidden="true">~</b> 条件付き</span>
+              <span class="status-chip status-effectless"><b aria-hidden="true">−</b> 効果なし</span>
+              <span class="status-chip status-unavailable"><b aria-hidden="true">×</b> 付与不可</span>
+              <span class="status-chip status-unknown"><b aria-hidden="true">?</b> 未確認</span>
+            </div>
+            <p class="result-count" id="result-count" role="status" aria-live="polite"></p>
+          </div>
+        </section>
+
+        <section class="catalogue-section" aria-labelledby="catalogue-heading">
+          <div class="section-heading">
+            <div><p class="eyebrow">THE COLLECTION</p><h2 id="catalogue-heading">収録カード</h2></div>
+            <p class="section-hint">右上の印は拡張・こだま・天使・悪魔。条件付きには本文からの候補を含み、未確認は効果なしと区別しています。</p>
+          </div>
+          <div id="card-grid" class="card-grid" aria-live="polite"></div>
+          <div id="empty-state" class="empty-state" hidden>
+            <div class="empty-mark" aria-hidden="true">⌕</div>
+            <h2>一致するカードがありません</h2>
+            <p>検索語を短くするか、絞り込み条件を見直してください。</p>
+            <button id="empty-reset" class="secondary-button" type="button">すべて表示</button>
+          </div>
+          <div id="load-error" class="load-error" hidden>
+            <h2>図鑑データを読み込めません</h2>
+            <p>ページを再読み込みしてください。</p>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>本文は原文の表記を保ったまま掲載しています。表示変数（例：<code>{0}</code>）も原文どおりです。</p>
+        <p>非公式の参照資料です。ゲーム本文・名称・画像の権利は各権利者に帰属します。<a href="https://github.com/solavrc/seiun-guide#出典権利">出典・読み方</a></p>
+        <p>本文基準日：2026-09-01<span class="notes-date"> ／ 公開注記：2026-09-15</span></p>
+      </footer>
+    </div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
